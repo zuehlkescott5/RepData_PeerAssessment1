@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
@@ -34,7 +29,7 @@ meanSteps.total
 hist(totalSteps$steps, breaks = 10, xlab = 'Steps by Day', ylab = 'Freq')
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
 ggplot(data = meanSteps.byday, aes(date, steps)) + 
@@ -43,7 +38,7 @@ ggplot(data = meanSteps.byday, aes(date, steps)) +
   ggtitle("Mean Steps by Day")
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-2.png)
+![](PA1_template_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
 
 ## Imputing missing values
 
@@ -113,4 +108,12 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+multiplot(weekday, weekend, cols=2)
 ```
+
+```
+## Loading required package: grid
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->

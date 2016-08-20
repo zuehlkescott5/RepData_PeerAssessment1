@@ -101,4 +101,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+multiplot(weekday, weekend, cols=2)
 ```
