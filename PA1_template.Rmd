@@ -105,6 +105,11 @@ __How much difference did replacing the MCTs make?__
 * The absolute difference in means is `r format(abs.mean.diff,scientific=F)` with percent change `r format(mean.pct.diff,scientific=F)`
 * The absolute difference in medians is `r format(abs.median.diff,scientific=F)` with percent change `r format(median.pct.diff,scientific=F)`
 
+__Take a look at a histogram of steps by day after missings are replaced.__
+
+```{r, results='hide', echo=TRUE}
+hist(totalSteps.transformed$steps, breaks = 10, xlab = 'Steps by Day after missings replaced', ylab = 'Freq')
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 

@@ -117,6 +117,14 @@ __How much difference did replacing the MCTs make?__
 * The absolute difference in means is 1411.959 with percent change 13.11 %
 * The absolute difference in medians is 370 with percent change 3.44 %
 
+__Take a look at a histogram of steps by day after missings are replaced.__
+
+
+```r
+hist(totalSteps.transformed$steps, breaks = 10, xlab = 'Steps by Day after missings replaced', ylab = 'Freq')
+```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -190,4 +198,4 @@ __Now to produce the plot panel.__
 multiplot(weekday, weekend, cols=2)
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
