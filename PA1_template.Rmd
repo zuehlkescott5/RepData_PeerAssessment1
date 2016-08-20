@@ -24,6 +24,8 @@ meanSteps.byday
 meanSteps.total <- mean(totalSteps$steps, na.rm = FALSE)
 meanSteps.total
 ```
+There were `r format(meanSteps.total,scientific=F)` steps daily, on average
+
 
 ## What is the average daily activity pattern?
 ```{r, results='hide', echo=TRUE}
