@@ -7,18 +7,21 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r, results='hide', echo=TRUE}
+
+```r
 library(ggplot2)
 library(plyr)
 ```
-```{r, results='hide', echo=TRUE}
+
+```r
 data.all <- read.csv(file = 'activity.csv', header = TRUE, colClasses = c('numeric', 'Date', 'numeric'))
 
 totalSteps<-aggregate(steps~date,data=data.all,sum,na.rm=FALSE)
 ```
 
 ## What is mean total number of steps taken per day?
-```{r, results='hide', echo=TRUE}
+
+```r
 meanSteps.byday<-aggregate(steps~date,data=totalSteps,mean,na.rm=FALSE)
 meanSteps.byday
 meanSteps.total <- mean(totalSteps$steps, na.rm = FALSE)
@@ -26,17 +29,25 @@ meanSteps.total
 ```
 
 ## What is the average daily activity pattern?
-```{r, results='hide', echo=TRUE}
-hist(totalSteps$steps, breaks = 10, xlab = 'Steps by Day', ylab = 'Freq')
 
+```r
+hist(totalSteps$steps, breaks = 10, xlab = 'Steps by Day', ylab = 'Freq')
+```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
+```r
 ggplot(data = meanSteps.byday, aes(date, steps)) + 
   geom_line() +
   scale_x_date(date_breaks = "1 day") + 
   ggtitle("Mean Steps by Day")
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-2.png)
+
 ## Imputing missing values
-```{r, results='hide', echo=TRUE}
+
+```r
 replace.with.mean <- function(x, fun) { 
   missing <- is.na(x) 
   replace(x, missing, fun(x[!missing])) 
@@ -49,7 +60,8 @@ data.transformed[is.na(data.transformed)] <- 0
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r, results='hide', echo=TRUE}
+
+```r
 data.transformed.weekday <- subset(data.transformed,  weekdays(date) == 'Saturday' | weekdays(date) == 'Sunday')
 data.transformed.weekend <- subset(data.transformed, weekdays(date) != 'Saturday' & weekdays(date) != 'Sunday')
 
