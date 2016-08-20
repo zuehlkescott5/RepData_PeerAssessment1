@@ -7,30 +7,54 @@ output:
 
 
 ## Loading and preprocessing the data
+__First, load in the packages ggplot2 and plyr__
 ```{r, results='hide', echo=TRUE}
 library(ggplot2)
 library(plyr)
 ```
+
+__Then, read in activity.csv and save it to R object data.all. with the following two additional steps.__
+
+* Set the steps column as numeric, date column as date, and interval column as numeric.  
+* Maintain the first row of the csv as column headers.
+
 ```{r, results='hide', echo=TRUE}
 data.all <- read.csv(file = 'activity.csv', header = TRUE, colClasses = c('numeric', 'Date', 'numeric'))
+```
 
+__Now that data.all exist, aggregate the number of steps, grouped by day.__
+
+* Keep missings in the set.  They'll be dealt with later.
+
+```{r, results='hide', echo=TRUE}
 totalSteps<-aggregate(steps~date,data=data.all,sum,na.rm=FALSE)
 ```
 
 ## What is mean total number of steps taken per day?
+__Here is the code__
 ```{r, results='hide', echo=TRUE}
 meanSteps.byday<-aggregate(steps~date,data=totalSteps,mean,na.rm=FALSE)
-meanSteps.byday
 meanSteps.total <- mean(totalSteps$steps, na.rm = FALSE)
-meanSteps.total
-```
-There were `r format(meanSteps.total,scientific=F)` steps daily, on average
 
+medianSteps.byday<-aggregate(steps~date,data=totalSteps,median,na.rm=FALSE)
+medianSteps.total <- median(totalSteps$steps, na.rm = FALSE)
+```
+
+__And here are the results__
+
+* The Mean Number of Steps per day (keeping missing values) is `r format(meanSteps.total,scientific=F)` 
+* The Median Number of Steps per day (keeping missing values) is `r format(medianSteps.total,scientific=F)` 
 
 ## What is the average daily activity pattern?
+__Take a look at a histogram of steps by day.__
+
 ```{r, results='hide', echo=TRUE}
 hist(totalSteps$steps, breaks = 10, xlab = 'Steps by Day', ylab = 'Freq')
+```
 
+__Now a time series plot of steps by day.__
+
+```{r, results='hide', echo=TRUE}
 ggplot(data = meanSteps.byday, aes(date, steps)) + 
   geom_line() +
   scale_x_date(date_breaks = "1 day") + 
@@ -38,6 +62,12 @@ ggplot(data = meanSteps.byday, aes(date, steps)) +
 ```
 
 ## Imputing missing values
+__To deal with missing data in the steps column, I'll do two treatments in series.__
+
+* First, calculate the mean number of steps by day for each day.
+* If a date has missing values, but at least one non-missing value, replace each with the daily mean.
+* If a date has _all_ missing values, overwrite them with 0.
+
 ```{r, results='hide', echo=TRUE}
 replace.with.mean <- function(x, fun) { 
   missing <- is.na(x) 
@@ -50,15 +80,46 @@ data.transformed <- ddply(data.all, ~ date, transform, steps = replace.with.mean
 data.transformed[is.na(data.transformed)] <- 0
 ```
 
+__Now that we've removed missing values, let's take another look at average steps per day.__
+```{r, results='hide', echo=TRUE}
+totalSteps.transformed <- aggregate(steps~date,data=data.transformed,sum, na.rm=FALSE)
+meanSteps.byday.replaced<-aggregate(steps~date,data=totalSteps.transformed,mean,na.rm=FALSE)
+meanSteps.total.replaced <- mean(totalSteps.transformed$steps, na.rm = FALSE)
+
+medianSteps.byday.replaced<-aggregate(steps~date,data=totalSteps.transformed,median,na.rm=FALSE)
+medianSteps.total.replaced <- median(totalSteps.transformed$steps, na.rm = FALSE)
+
+abs.mean.diff <- abs(meanSteps.total - meanSteps.total.replaced)
+abs.median.diff <- abs(medianSteps.total - medianSteps.total.replaced)
+mean.pct.diff <- paste(round((abs.mean.diff / meanSteps.total)*100,digits = 2),'%')
+median.pct.diff <- paste(round((abs.median.diff / medianSteps.total)*100,digits = 2),'%')
+```
+
+__And here are the results__
+
+* The Mean Number of Steps per day (replacing missing values): `r format(meanSteps.total.replaced,scientific=F)` 
+* The Median Number of Steps per day (replacing missing values): `r format(medianSteps.total.replaced,scientific=F)` 
+    
+__How much difference did replacing the MCTs make?__
+
+* The absolute difference in means is `r format(abs.mean.diff,scientific=F)` with percent change `r format(mean.pct.diff,scientific=F)`
+* The absolute difference in medians is `r format(abs.median.diff,scientific=F)` with percent change `r format(median.pct.diff,scientific=F)`
+
+
 ## Are there differences in activity patterns between weekdays and weekends?
+
+__I'll be building a panel plot of side by side line charts.  First, I need to create data separating weekdays and weekend, then roll up to mean by interval.__
 ```{r, results='hide', echo=TRUE}
 data.transformed.weekday <- subset(data.transformed,  weekdays(date) == 'Saturday' | weekdays(date) == 'Sunday')
 data.transformed.weekend <- subset(data.transformed, weekdays(date) != 'Saturday' & weekdays(date) != 'Sunday')
 
-
 meanSteps.byweekend.transform<-aggregate(steps~interval,data=data.transformed.weekend,mean)
 meanSteps.byweekday.transform<-aggregate(steps~interval,data=data.transformed.weekday,mean)
+```
 
+__Now, create the line charts for weekend days and week days.__
+
+```{r, results='hide', echo=TRUE}
 weekend <- ggplot(data = meanSteps.byweekend.transform, aes(interval, steps)) + 
   geom_line() +
   ggtitle("Mean Steps by Interval for Weekend")
@@ -66,8 +127,11 @@ weekend <- ggplot(data = meanSteps.byweekend.transform, aes(interval, steps)) +
 weekday <- ggplot(data = meanSteps.byweekday.transform, aes(interval, steps)) + 
   geom_line() +
   ggtitle("Mean Steps by Interval for Week Days")
+```
 
+__I took this function from an R cookbook that creates a plot planel of pre-existing R plots.__
 
+```{r, results='hide', echo=TRUE}
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   require(grid)
   
@@ -103,6 +167,9 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+```
+__Now to produce the plot panel.__
 
+```{r, results='hide', echo=TRUE}
 multiplot(weekday, weekend, cols=2)
 ```
